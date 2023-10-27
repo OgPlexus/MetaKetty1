@@ -1,0 +1,596 @@
+---
+title: "A meta-analysis of direct experimental evidence highlights the idiosyncratic nature of tradeoffs in models of virus evolution Code"
+author: "Ketty Kabengele, Sarah Renee Phillips,Wendy C. Turner, and C. Brandon Ogbunugafor"
+date: '2023-06-28'
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#methods are adapted from here: Harrer, M., Cuijpers, P., Furukawa, T., & Ebert, D. (2021). Doing Meta-Analysis with R: A Hands-On Guide (1st ed.). Chapman and Hall/CRC. https://doi.org/10.1201/9781003107347
+
+#Set working directory
+setwd("/Users/kettymunyenyembe/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/Code")
+```
+
+```{r}
+library(dmetar) 
+library(dplyr)
+library(metafor)
+library(esc)
+library(meta)
+library(readxl)
+```
+
+```{r}
+#Running analysis for all datasest to see an overall pattern
+Final_allData <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_allData.xlsx")
+m.allData <- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = Final_allData,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.allData)
+#Creating a forest plot
+forest.meta(m.allData,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graph as pdf
+pdf(file = "MainPlot.pdf", width = 8, height = 15)
+forest.meta(m.allData, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Finding outliers
+#find.outliers(m.allData)
+```
+
+```{r}
+#Running the analysis for the evolution of virulence framework
+data_EoV <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_EoV.xlsx")
+m.Final_EoV <- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_EoV,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_EoV)
+#Make a forest plot
+forest.meta(m.Final_EoV,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Save the graph 
+pdf(file = "EvolutionOfVirulencePlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_EoV, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Finding outliers
+#find.outliers(m.Final_EoV)
+```
+
+```{r}
+#Making funnel plots for the evolution of virulence framework to test for publication bias
+par(mfrow=c(1,2))
+funnel.meta(m.Final_EoV,
+            xlim = c(-2.5, 2.5),
+            cex.studlab = 0.5,
+            lwd = 0.5, cex = 0.7,
+            studlab = F)
+col.contour = c("gray75", "gray85", "gray95")
+funnel.meta(m.Final_EoV, xlim = c(-2.5, 4),
+            contour = c(0.9, 0.95, 0.99),
+            lwd = 0.5, cex = 0.6, 
+            col.contour = col.contour)
+legend(x = 1.5, y = 0, 
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour, cex = 0.7)
+```
+
+```{r}
+#Analysis for the life history framework
+data_LHT <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_LHT.xlsx")
+m.Final_LHT<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_LHT,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_LHT)
+#Plot the results
+forest.meta(m.Final_LHT,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graph
+pdf(file = "LifeHistoryTheoryPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_LHT, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Finding outliers
+#find.outliers(m.Final_LHT)
+```
+
+```{r}
+#Making funnel plots for life history theory
+par(mfrow=c(1,2))
+funnel.meta(m.Final_LHT,
+            xlim = c(-2.5, 2.5),
+            cex.studlab = 0.5,
+            lwd = 0.5, cex = 0.7,
+            studlab = F)
+# Define fill colors for contour
+col.contour = c("gray75", "gray85", "gray95")
+funnel.meta(m.Final_LHT, xlim = c(-2.5, 4),
+            contour = c(0.9, 0.95, 0.99),
+            lwd = 0.5, cex = 0.6, 
+            col.contour = col.contour)
+legend(x = 1.8, y = 0, 
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour, cex = 0.7)
+```
+
+
+```{r}
+#Analysis for generalism-specialism dichotomy
+data_SnG <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_SnG.xlsx")
+m.Final_SnG<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_SnG,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_SnG)
+#Plot the results
+forest.meta(m.Final_SnG,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graphs
+pdf(file = "SpecialistGeneralistPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_SnG, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Finding outliers
+#find.outliers(m.Final_SnG)
+```
+
+```{r}
+#Making funnel plots for generalism-specialism dichotomy
+par(mfrow=c(1,2))
+funnel.meta(m.Final_SnG,
+            xlim = c(-2.5, 2.5),
+            cex.studlab = 0.5,
+            lwd = 0.5, cex = 0.7,
+            studlab = F)
+# Define fill colors for contour
+col.contour = c("gray75", "gray85", "gray95")
+funnel.meta(m.Final_SnG, xlim = c(-2.5, 4),
+            contour = c(0.9, 0.95, 0.99),
+            lwd = 0.5, cex = 0.6, 
+            col.contour = col.contour)
+legend(x = 1.5, y = 0, 
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour, cex = 0.7)
+```
+
+
+```{r}
+#Analysis for plant viruses
+data_plants <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_PlantViruses.xlsx")
+m.Final_plants<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_plants,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_plants)
+#Plot the results
+forest.meta(m.Final_plants,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graphs
+pdf(file = "PlantsPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_plants, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Find outliers
+#find.outliers(m.Final_plants)
+
+#Making funnel plots for plant viruses
+# par(mfrow=c(1,2))
+# funnel.meta(m.Final_plants,
+#             xlim = c(-2.5, 2.5),
+#             cex.studlab = 0.5,
+#             lwd = 0.5, cex = 0.7,
+#             studlab = F)
+# # Define fill colors for contour
+# col.contour = c("gray75", "gray85", "gray95")
+# funnel.meta(m.Final_plants, xlim = c(-2.5, 4),
+#             contour = c(0.9, 0.95, 0.99),
+#             lwd = 0.5, cex = 0.6, 
+#             col.contour = col.contour)
+# legend(x = 1.5, y = 0, 
+#        legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+#        fill = col.contour, cex = 0.7)
+```
+
+```{r}
+#Analysis for animal and fungal viruses 
+data_animals <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_AnimalViruses.xlsx")
+m.Final_animals<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_animals,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_animals)
+#Plot the results
+forest.meta(m.Final_animals,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graphs
+pdf(file = "AnimalPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_animals, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Find outliers
+#find.outliers(m.Final_animals)
+
+#Making funnel plots for animal viruses
+# par(mfrow=c(1,2))
+#  funnel.meta(m.Final_animals,
+#             xlim = c(-2.5, 2.5),
+#             cex.studlab = 0.5,
+#             lwd = 0.5, cex = 0.7,
+#             studlab = F)
+# # Define fill colors for contour
+# col.contour = c("gray75", "gray85", "gray95")
+# funnel.meta(m.Final_animals, xlim = c(-2.5, 4),
+#             contour = c(0.9, 0.95, 0.99),
+#             lwd = 0.5, cex = 0.6, 
+#             col.contour = col.contour)
+# legend(x = 1.5, y = 0, 
+#        legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+#        fill = col.contour, cex = 0.7)
+```
+
+```{r}
+#Analysis for bacteriophages
+data_phages <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_Bacteriophages.xlsx")
+m.Final_phages<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_phages,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_phages)
+#Plot the results
+forest.meta(m.Final_phages,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+
+#Saving the graphs
+pdf(file = "PhagesPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_phages, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+#Find outliers
+#find.outliers(m.Final_phages)
+
+#Making funnel plots for phages
+# par(mfrow=c(1,2))
+# funnel.meta(m.Final_phages,
+#             xlim = c(-2.5, 2.5),
+#             cex.studlab = 0.5,
+#             lwd = 0.5, cex = 0.7,
+#             studlab = F)
+# # Define fill colors for contour
+# col.contour = c("gray75", "gray85", "gray95")
+# funnel.meta(m.Final_phages, xlim = c(-2.7, 4.4),
+#             contour = c(0.9, 0.95, 0.99),
+#             lwd = 0.5, cex = 0.6, 
+#             col.contour = col.contour)
+# legend(x = 1.5, y = 0, 
+#        legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+#        fill = col.contour, cex = 0.7)
+```
+
+```{r}
+#Analysis for plant viruses by evolution of virulence
+data_plantsEoV <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_PlantVirusesEoV.xlsx")
+m.Final_plantsEoV<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_plantsEoV,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_plantsEoV)
+#Plot the results
+# forest.meta(m.Final_plantsEoV,
+#             sortvar = TE,#order results by effect size
+#             print.tau2 = TRUE,
+#             plotwidth = '4cm',
+#             cex = 0.85,
+#             spacing = 1,
+#             fontsize = 13,
+#             squaresize = 0.7,
+#             col.square = "blue",
+#             print.weight = FALSE,
+#             leftlabs = c("Dataset", "N"))
+# 
+# #Saving the graphs
+# pdf(file = "PlantsEoVPlot.pdf", width = 8, height = 15)
+# forest.meta(m.Final_plantsEoV, 
+#             sortvar = TE,
+#             prediction = TRUE, 
+#             print.tau2 = FALSE,
+#             leftlabs = c("Dataset", "N"))
+# dev.off()
+#Find outliers
+#find.outliers(m.Final_plantsEoV)
+```
+
+```{r}
+#Analysis for Animal and fungal viruses by evolution of virulence
+data_animalfungEoV <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_AnimalVirusesEoV.xlsx")
+m.Final_animalfungEoV<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_animalfungEoV,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_animalfungEoV)
+#Plot the results
+# forest.meta(m.Final_animalfungEoV,
+#             sortvar = TE,#order results by effect size
+#             print.tau2 = TRUE,
+#             plotwidth = '4cm',
+#             cex = 0.85,
+#             spacing = 1,
+#             fontsize = 13,
+#             squaresize = 0.7,
+#             col.square = "blue",
+#             print.weight = FALSE,
+#             leftlabs = c("Dataset", "N"))
+```
+
+```{r}
+#Analysis for Animal and fungal viruses by life history theory
+data_animalfungLHT <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_AnimalVirusesLHT.xlsx")
+m.Final_animalfungLHT<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_animalfungLHT,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_animalfungLHT)
+#Plot the results
+# forest.meta(m.Final_animalfungLHT,
+#             sortvar = TE,#order results by effect size
+#             print.tau2 = TRUE,
+#             plotwidth = '4cm',
+#             cex = 0.85,
+#             spacing = 1,
+#             fontsize = 13,
+#             squaresize = 0.7,
+#             col.square = "blue",
+#             print.weight = FALSE,
+#             leftlabs = c("Dataset", "N"))
+```
+
+```{r}
+#Analysis for Animal and fungal viruses by generalism-specialism dichotomy
+data_animalfungGnS <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_AnimalVirusesG_S.xlsx")
+m.Final_animalfungGnS<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_animalfungGnS,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_animalfungGnS)
+#Plot the results
+# forest.meta(m.Final_animalfungGnS,
+#             sortvar = TE,#order results by effect size
+#             print.tau2 = TRUE,
+#             plotwidth = '4cm',
+#             cex = 0.85,
+#             spacing = 1,
+#             fontsize = 13,
+#             squaresize = 0.7,
+#             col.square = "blue",
+#             print.weight = FALSE,
+#             leftlabs = c("Dataset", "N"))
+```
+
+```{r}
+#Analysis for life history theory with evolution of virulence
+data_LHTEoV <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_EoV_LHT.xlsx")
+m.Final_LHTEoV<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_LHTEoV,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_LHTEoV)
+#Plot the results
+forest.meta(m.Final_LHTEoV,
+            sortvar = TE,#order results by effect size
+            print.tau2 = TRUE,
+            plotwidth = '4cm',
+            cex = 0.85,
+            spacing = 1,
+            fontsize = 13,
+            squaresize = 0.7,
+            col.square = "blue",
+            print.weight = FALSE,
+            leftlabs = c("Dataset", "N"))
+#Saving the graphs
+pdf(file = "EoVLHTPlot.pdf", width = 8, height = 15)
+forest.meta(m.Final_LHTEoV, 
+            sortvar = TE,
+            prediction = TRUE, 
+            print.tau2 = FALSE,
+            leftlabs = c("Dataset", "N"))
+dev.off()
+```
+
+```{r}
+#Analysis for phages with evolution of virulence
+data_phagesEoV <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_BacteriophagesEoV.xlsx")
+m.Final_phagesEoV<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_phagesEoV,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_phagesEoV)
+
+
+#Analysis for phages with life history theory
+data_phagesLHT <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_BacteriophagesLHT.xlsx")
+m.Final_phagesLHT<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_phagesLHT,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_phagesLHT)
+
+#Analysis for phages with generalism-specialism dichotomy
+data_phagesGS <- read_excel("~/Desktop/FinalMeta_Ketty_Sarah_Wendy_Brandon/DataExcel_Files/Final_BacteriophagesG_S.xlsx")
+m.Final_phagesGS<- metacor(cor = cor, 
+                 n = N,
+                 studlab = Dataset,
+                 data = data_phagesGS,
+                 fixed = FALSE,
+                 random = TRUE,
+                 method.tau = "SJ",
+                 hakn = TRUE,
+                 title = "Overall effect")
+summary(m.Final_phagesGS)
+```
+
+
